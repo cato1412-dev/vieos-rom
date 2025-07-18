@@ -1,218 +1,669 @@
 <!DOCTYPE html>
-<html lang="vi" class="dark:text-gray-100 text-gray-800">
+<html lang="vi" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VieOS – ROM Android cho người Việt</title>
-
-  <!-- Tailwind chạy bằng trình duyệt -->
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
-  <!-- AlpineJS -->
+  <meta name="description" content="VieOS - ROM Android tối ưu cho người Việt. Nhanh, mượt, sạch và không quảng cáo.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Alpine.js -->
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.12.0/dist/cdn.min.js" defer></script>
-
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
   <style>
-    html {
-      scroll-behavior: smooth;
+    body { font-family: 'Inter', sans-serif; }
+    
+    /* Custom animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
     }
-
+    
     @keyframes fadeInUp {
-      0% { opacity: 0; transform: translateY(20px); }
+      0% { opacity: 0; transform: translateY(30px); }
       100% { opacity: 1; transform: translateY(0); }
     }
-    .fade-in {
-      animation: fadeInUp 1s ease-out forwards;
+    
+    @keyframes slideInLeft {
+      0% { opacity: 0; transform: translateX(-50px); }
+      100% { opacity: 1; transform: translateX(0); }
     }
-    .fade-in-delay-1 { animation-delay: 0.3s; }
-    .fade-in-delay-2 { animation-delay: 0.6s; }
-    .fade-in-delay-3 { animation-delay: 0.9s; }
+    
+    @keyframes slideInRight {
+      0% { opacity: 0; transform: translateX(50px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    .animate-float { animation: float 3s ease-in-out infinite; }
+    .animate-fadeInUp { animation: fadeInUp 0.8s ease-out forwards; }
+    .animate-slideInLeft { animation: slideInLeft 0.8s ease-out forwards; }
+    .animate-slideInRight { animation: slideInRight 0.8s ease-out forwards; }
+    .animate-pulse-slow { animation: pulse 2s infinite; }
+    
+    /* Gradient backgrounds */
+    .bg-gradient-primary { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+    .bg-gradient-secondary { background: linear-gradient(135deg, #f87171 0%, #ef4444 100%); }
+    
+    /* Glass effect */
+    .glass {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Dark mode glass */
+    .dark .glass {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #ef4444; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+    
+    /* Intersection Observer animations */
+    .fade-in-observer {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+    }
+    .fade-in-observer.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
   </style>
 </head>
 
-<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 font-sans transition-colors duration-300">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-all duration-300" 
+      x-data="{ darkMode: false }" 
+      :class="{ 'dark': darkMode }">
 
-  <header class="bg-white dark:bg-gray-800 shadow sticky top-0 z-50 fade-in" x-data="{ open: false }">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-      <!-- Logo -->
-      <img src="logos/logo1.png" alt="VieOS Logo" class="h-10">
+  <!-- Header -->
+  <header class="fixed top-0 w-full z-50 glass backdrop-blur-md shadow-lg transition-all duration-300" 
+          x-data="{ open: false, scrolled: false }" 
+          x-init="window.addEventListener('scroll', () => scrolled = window.scrollY > 50)"
+          :class="{ 'bg-white/90 dark:bg-gray-900/90': scrolled }">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex justify-between items-center">
+        <!-- Logo -->
+        <div class="flex items-center space-x-3">
+          <img src="logos/logo2.png" alt="VieOS Logo" class="h-10 w-15 animate-pulse-slow">
+          <!--<span class="text-xl font-bold text-red-600">VieOS</span>-->
+        </div>
 
-      <!-- Desktop menu -->
-      <nav class="hidden md:flex space-x-4 text-sm font-medium">
-        <a href="#about" class="hover:text-red-500">Giới thiệu</a>
-        <a href="#features" class="hover:text-red-500">Tính năng</a>
-        <a href="#screenshots" class="hover:text-red-500">Hình ảnh</a>
-        <a href="changelog.html" class="hover:text-red-500">Changelog</a>
-        <a href="credit.html" class="hover:text-red-500">Credit</a>
-        <a href="#contact" class="hover:text-red-500">Liên hệ</a>
-      </nav>
+        <!-- Desktop Navigation -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="#about" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Giới thiệu</a>
+          <a href="#features" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Tính năng</a>
+          <a href="#screenshots" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Hình ảnh</a>
+          <a href="changelog.html" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Changelog</a>
+          <a href="credit.html" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Credit</a>
+          <a href="#contact" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Liên hệ</a>
+          
+          <!-- Dark mode toggle -->
+          <button @click="darkMode = !darkMode" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+            <svg x-show="!darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+            </svg>
+            <svg x-show="darkMode" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+            </svg>
+          </button>
+        </nav>
 
-      <!-- Hamburger icon -->
-      <button @click="open = !open" class="md:hidden text-gray-700 dark:text-gray-100 focus:outline-none z-50">
-        <template x-if="!open">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16" />
+        <!-- Mobile menu button -->
+        <button @click="open = !open" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+          <svg x-show="!open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
-        </template>
-        <template x-if="open">
-          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12" />
+          <svg x-show="open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
-        </template>
-      </button>
-    </div>
+        </button>
+      </div>
 
-    <!-- Mobile menu (overlay) -->
-    <div
-      x-show="open"
-      x-transition:enter="transition transform ease-out duration-300"
-      x-transition:enter-start="opacity-0 scale-y-0"
-      x-transition:enter-end="opacity-100 scale-y-100"
-      x-transition:leave="transition transform ease-in duration-200"
-      x-transition:leave-start="opacity-100 scale-y-100"
-      x-transition:leave-end="opacity-0 scale-y-0"
-      class="absolute top-full left-0 w-full bg-white dark:bg-gray-900 shadow-md origin-top transform scale-y-100 z-40 px-6 py-6 text-right text-sm font-medium"
-      style="display: none;"
-    >
-      <div class="space-y-3">
-        <a @click="open = false" href="#about" class="block hover:text-red-500 transition">Giới thiệu</a>
-        <a @click="open = false" href="#features" class="block hover:text-red-500 transition">Tính năng</a>
-        <a @click="open = false" href="#screenshots" class="block hover:text-red-500 transition">Hình ảnh</a>
-        <a @click="open = false" href="changelog.html" class="block hover:text-red-500 transition">Changelog</a>
-        <a @click="open = false" href="credit.html" class="block hover:text-red-500 transition">Credit</a>
-        <a @click="open = false" href="#contact" class="block hover:text-red-500 transition">Liên hệ</a>
+      <!-- Mobile Menu -->
+      <div x-show="open" 
+           x-transition:enter="transition ease-out duration-200"
+           x-transition:enter-start="opacity-0 transform -translate-y-2"
+           x-transition:enter-end="opacity-100 transform translate-y-0"
+           x-transition:leave="transition ease-in duration-150"
+           x-transition:leave-start="opacity-100 transform translate-y-0"
+           x-transition:leave-end="opacity-0 transform -translate-y-2"
+           class="md:hidden mt-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+        <div class="flex flex-col space-y-3">
+          <a href="#about" @click="open = false" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Giới thiệu</a>
+          <a href="#features" @click="open = false" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Tính năng</a>
+          <a href="#screenshots" @click="open = false" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Hình ảnh</a>
+          <a href="changelog.html" @click="open = false" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Changelog</a>
+          <a href="credit.html" @click="open = false" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Credit</a>
+          <a href="#contact" @click="open = false" class="text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">Liên hệ</a>
+          <button @click="darkMode = !darkMode" class="flex items-center space-x-2 text-gray-700 dark:text-gray-200 hover:text-red-500 transition-colors duration-200 font-medium">
+            <span>Chế độ tối</span>
+            <div class="w-10 h-6 bg-gray-300 dark:bg-gray-600 rounded-full relative">
+              <div class="w-4 h-4 bg-white rounded-full absolute top-1 transition-transform duration-200" 
+                   :class="{ 'translate-x-4': darkMode, 'translate-x-1': !darkMode }"></div>
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   </header>
 
-
-  <!-- Hero -->
-  <section class="bg-gradient-to-r from-red-600 to-red-700 text-white py-20 fade-in fade-in-delay-1">
-    <div class="container mx-auto text-center">
-      <img src="logos/logo2.png" alt="VieOS Logo" class="mx-auto h-28 sm:h-60 mb-6">
-      <p class="text-lg md:text-xl mb-6">Nhanh, mượt, sạch và tối ưu cho trải nghiệm Việt Nam</p>
-      <a href="#download" class="bg-white text-red-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition">Tải về ngay</a>
+  <!-- Hero Section -->
+  <section class="relative min-h-screen flex items-center justify-center bg-gradient-primary overflow-hidden pt-20">
+    <!-- Animated background elements -->
+    <div class="absolute inset-0 opacity-20">
+      <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-white/20 rounded-full animate-float"></div>
+      <div class="absolute bottom-1/4 right-1/4 w-48 h-48 bg-white/10 rounded-full animate-float" style="animation-delay: 1s;"></div>
+      <div class="absolute top-3/4 left-1/3 w-32 h-32 bg-white/30 rounded-full animate-float" style="animation-delay: 2s;"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 text-center text-white relative z-10">
+      <div class="animate-fadeInUp">
+        <img src="logos/logo2.png" alt="VieOS Logo" class="mx-auto h-32 md:h-48 mb-8 animate-pulse-slow">
+        <h1 class="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-white to-red-100 bg-clip-text text-transparent">
+          VieOS
+        </h1>
+        <p class="text-lg md:text-2xl mb-8 text-red-100 max-w-3xl mx-auto">
+          ROM Android thuần Việt - Nhanh, mượt, sạch và tối ưu cho trải nghiệm hoàn hảo
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#download" class="bg-white text-red-600 px-8 py-4 rounded-full font-semibold hover:bg-red-50 transition-all duration-300 transform hover:scale-105 shadow-lg">
+            Tải về ngay
+          </a>
+          <a href="#about" class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-red-600 transition-all duration-300 transform hover:scale-105">
+            Tìm hiểu thêm
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 
-  <!-- About -->
-  <section id="about" class="py-16 bg-white dark:bg-gray-900 fade-in fade-in-delay-2">
-    <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-bold mb-4">Giới thiệu về VieOS</h2>
-      <p class="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
-        VieOS là một bản ROM Android được tùy biến dành riêng cho người dùng Việt Nam. Không quảng cáo rác, không ứng dụng thừa – chỉ tập trung vào trải nghiệm mượt mà, nhẹ và ổn định.
-      </p>
-    </div>
-  </section>
-
-   <!-- Features -->
-    <section id="features" class="py-16 bg-gray-100 dark:bg-gray-800 fade-in fade-in-delay-3">
-      <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-12">Tính năng nổi bật</h2>
-        <div class="grid md:grid-cols-3 gap-8">
-          <!-- Tính năng 1 -->
-          <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow fade-in">
-            <h3 class="text-xl font-semibold text-red-600 mb-2">Thuần Việt</h3>
-            <p class="text-gray-600 dark:text-gray-300">
-              Giao diện và ứng dụng được tối ưu cho người dùng Việt, hỗ trợ tiếng Việt 100%.
-            </p>
+  <!-- About Section -->
+  <section id="about" class="py-20 bg-white dark:bg-gray-900">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16 fade-in-observer">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+          Giới thiệu về VieOS
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300 text-lg md:text-xl max-w-4xl mx-auto leading-relaxed">
+          VieOS là một bản ROM Android được tùy biến dành riêng cho người dùng Việt Nam. 
+          Chúng tôi tập trung vào việc tạo ra một trải nghiệm mượt mà, nhẹ nhang và ổn định, 
+          loại bỏ hoàn toàn quảng cáo rác và ứng dụng không cần thiết.
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-12 items-center">
+        <div class="fade-in-observer">
+          <div class="bg-gradient-to-br from-red-50 to-red-100 dark:from-gray-800 dark:to-gray-700 p-8 rounded-2xl">
+            <h3 class="text-2xl font-semibold mb-4 text-red-600 dark:text-red-400">Tại sao chọn VieOS?</h3>
+            <ul class="space-y-3 text-gray-700 dark:text-gray-300">
+              <li class="flex items-start">
+                <span class="text-red-500 mr-2">✓</span>
+                <span>Giao diện được tối ưu hoàn toàn cho người Việt</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-red-500 mr-2">✓</span>
+                <span>Hiệu suất vượt trội với thời lượng pin lâu hơn</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-red-500 mr-2">✓</span>
+                <span>Bảo mật cao với cập nhật thường xuyên</span>
+              </li>
+              <li class="flex items-start">
+                <span class="text-red-500 mr-2">✓</span>
+                <span>Cộng đồng hỗ trợ tích cực và nhiệt tình</span>
+              </li>
+            </ul>
           </div>
-          <!-- Tính năng 2 -->
-          <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow fade-in fade-in-delay-1">
-            <h3 class="text-xl font-semibold text-red-600 mb-2">Hiệu suất mượt mà</h3>
-            <p class="text-gray-600 dark:text-gray-300">
-              Loại bỏ ứng dụng rác, tinh chỉnh hệ thống để tăng hiệu năng và thời lượng pin.
-            </p>
-          </div>
-          <!-- Tính năng 3 -->
-          <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow fade-in fade-in-delay-2">
-            <h3 class="text-xl font-semibold text-red-600 mb-2">Google Services đầy đủ</h3>
-            <p class="text-gray-600 dark:text-gray-300">
-              Tích hợp sẵn Google Play, GMS và cập nhật bảo mật mới nhất.
-            </p>
-          </div>
-          <!-- Tính năng 4 -->
-          <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow fade-in fade-in-delay-3">
-            <h3 class="text-xl font-semibold text-red-600 mb-2">OTA Cập nhật</h3>
-            <p class="text-gray-600 dark:text-gray-300">
-              Hệ thống cập nhật không dây giúp bạn luôn có phiên bản mới nhất chỉ với 1 lần nhấn.
-            </p>
-          </div>
-          <!-- Tính năng 5 -->
-          <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow fade-in">
-            <h3 class="text-xl font-semibold text-red-600 mb-2">Không quảng cáo</h3>
-            <p class="text-gray-600 dark:text-gray-300">
-              Không có app TQ, không app quảng cáo, tập trung vào trải nghiệm gốc và sạch.
-            </p>
-          </div>
-          <!-- Tính năng 6 -->
-          <div class="bg-white dark:bg-gray-700 p-6 rounded-2xl shadow fade-in fade-in-delay-1">
-            <h3 class="text-xl font-semibold text-red-600 mb-2">Hỗ trợ nhiều thiết bị</h3>
-            <p class="text-gray-600 dark:text-gray-300">
-              Được build cho nhiều dòng máy phổ biến tại Việt Nam: Xiaomi, Realme, Samsung, v.v.
-            </p>
+        </div>
+        
+        <div class="fade-in-observer">
+          <div class="relative">
+            <div class="bg-gradient-to-r from-red-600 to-red-700 p-8 rounded-2xl text-white">
+              <h3 class="text-2xl font-semibold mb-4">Thống kê ấn tượng</h3>
+              <div class="grid grid-cols-2 gap-6">
+                <div class="text-center">
+                  <div class="text-3xl font-bold mb-2">50K+</div>
+                  <div class="text-red-100">Lượt tải</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-3xl font-bold mb-2">98%</div>
+                  <div class="text-red-100">Hài lòng</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-3xl font-bold mb-2">15+</div>
+                  <div class="text-red-100">Thiết bị</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-3xl font-bold mb-2">24/7</div>
+                  <div class="text-red-100">Hỗ trợ</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-  <!-- Screenshots -->
-    <section id="screenshots" class="py-8 bg-white dark:bg-gray-900 fade-in fade-in-delay-2">
-      <div class="container mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center mb-6">Hình ảnh giao diện</h2>
-        <div 
-          x-data="{
-            active: 0,
-            images: Array.from({ length: 10 }, (_, i) => `images/screen${i + 1}.jpg`),
-            next() { this.active = (this.active + 1) % this.images.length },
-            prev() { this.active = (this.active - 1 + this.images.length) % this.images.length },
-            startAutoSlide() {
-              setInterval(() => this.next(), 3000);
-            }
-          }"
-          x-init="startAutoSlide()"
-          class="relative w-full max-w-3xl mx-auto"
-        >
-          <!-- Mobile: 1 ảnh -->
-          <div class="block md:hidden relative">
-            <img :src="images[active]" class="rounded-xl shadow-lg w-full h-auto object-cover transition duration-300">
-            <div class="absolute top-1/2 left-0 transform -translate-y-1/2 px-2">
-              <button @click="prev()" class="text-2xl text-white bg-black/50 rounded-full p-1">&#8592;</button>
-            </div>
-            <div class="absolute top-1/2 right-0 transform -translate-y-1/2 px-2">
-              <button @click="next()" class="text-2xl text-white bg-black/50 rounded-full p-1">&#8594;</button>
-            </div>
+  <!-- Features Section -->
+  <section id="features" class="py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16 fade-in-observer">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+          Tính năng nổi bật
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto">
+          Khám phá những tính năng đặc biệt làm nên sự khác biệt của VieOS
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="fade-in-observer bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <div class="bg-red-100 dark:bg-red-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
           </div>
+          <h3 class="text-xl font-semibold text-red-600 dark:text-red-400 mb-3">Thuần Việt</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            Giao diện và ứng dụng được tối ưu hoàn toàn cho người dùng Việt, hỗ trợ tiếng Việt 100% với font chữ đẹp mắt.
+          </p>
+        </div>
 
-          <!-- Desktop: 5 ảnh -->
-          <div class="hidden md:grid grid-cols-5 gap-4">
-            <template x-for="(img, index) in images.slice(active, active + 5)" :key="index">
-              <img :src="img" class="rounded-xl shadow-lg w-full h-auto object-cover transform hover:scale-105 transition duration-300">
+        <!-- Feature 2 -->
+        <div class="fade-in-observer bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <div class="bg-red-100 dark:bg-red-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-red-600 dark:text-red-400 mb-3">Hiệu suất mượt mà</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            Loại bỏ ứng dụng rác, tinh chỉnh hệ thống sâu để tăng hiệu năng và kéo dài thời lượng pin đáng kể.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="fade-in-observer bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <div class="bg-red-100 dark:bg-red-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-red-600 dark:text-red-400 mb-3">Google Services đầy đủ</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            Tích hợp sẵn Google Play Services, GMS hoàn chỉnh và luôn cập nhật bảo mật mới nhất từ Google.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="fade-in-observer bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <div class="bg-red-100 dark:bg-red-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-red-600 dark:text-red-400 mb-3">OTA Cập nhật</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            Hệ thống cập nhật không dây thông minh giúp bạn luôn có phiên bản mới nhất chỉ với 1 lần chạm.
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="fade-in-observer bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <div class="bg-red-100 dark:bg-red-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-red-600 dark:text-red-400 mb-3">Không quảng cáo</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            Hoàn toàn không có app Trung Quốc, không quảng cáo spam, tập trung vào trải nghiệm người dùng thuần khiết.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="fade-in-observer bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <div class="bg-red-100 dark:bg-red-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+            <svg class="w-8 h-8 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-red-600 dark:text-red-400 mb-3">Hỗ trợ nhiều thiết bị</h3>
+          <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+            Được build chuyên biệt cho nhiều dòng máy phổ biến tại Việt Nam: Xiaomi, Realme, Samsung, OnePlus, v.v.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshots Section -->
+  <section id="screenshots" class="py-20 bg-white dark:bg-gray-900">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16 fade-in-observer">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent py-1">
+          Hình ảnh giao diện
+        </h2>
+        <!--<p class="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto">
+          Khám phá giao diện đẹp mắt và hiện đại của VieOS
+        </p>-->
+      </div>
+      
+      <div class="fade-in-observer" 
+           x-data="{
+             active: 0,
+             images: Array.from({ length: 10 }, (_, i) => `images/screen${i + 1}.jpg`),
+             next() { this.active = (this.active + 1) % this.images.length },
+             prev() { this.active = (this.active - 1 + this.images.length) % this.images.length },
+             goto(index) { this.active = index },
+             startAutoSlide() {
+               setInterval(() => this.next(), 4000);
+             }
+           }"
+           x-init="startAutoSlide()">
+        
+        <!-- Mobile: Single image with navigation -->
+        <div class="block lg:hidden relative max-w-sm mx-auto">
+          <div class="relative overflow-hidden rounded-2xl shadow-2xl">
+            <img :src="images[active]" 
+                 class="w-full h-auto object-cover transition-transform duration-500 hover:scale-110">
+            
+            <!-- Navigation arrows -->
+            <button @click="prev()" 
+                    class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+            </button>
+            
+            <button @click="next()" 
+                    class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all duration-200">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- Dots indicator -->
+          <div class="flex justify-center mt-6 space-x-2">
+            <template x-for="(img, index) in images" :key="index">
+              <button @click="goto(index)" 
+                      class="w-3 h-3 rounded-full transition-all duration-200"
+                      :class="{ 'bg-red-600': active === index, 'bg-gray-300 dark:bg-gray-600': active !== index }">
+              </button>
             </template>
           </div>
         </div>
+
+        <!-- Desktop: Multiple images grid -->
+        <div class="hidden lg:block">
+          <div class="grid grid-cols-5 gap-6">
+            <template x-for="(img, index) in images.slice(active, active + 5)" :key="index">
+              <div class="relative group cursor-pointer overflow-hidden rounded-xl shadow-lg">
+                <img :src="img" 
+                     class="w-full h-auto object-cover transition-all duration-300 group-hover:scale-110">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              </div>
+            </template>
+          </div>
+          
+          <!-- Navigation for desktop -->
+          <div class="flex justify-center mt-8 space-x-4">
+            <button @click="prev()" 
+                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full transition-all duration-200 flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              <span>Trước</span>
+            </button>
+            
+            <button @click="next()" 
+                    class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-full transition-all duration-200 flex items-center space-x-2">
+              <span>Sau</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-
-  <!-- Contact -->
-  <section id="contact" class="py-16 bg-white dark:bg-gray-900 fade-in fade-in-delay-3">
+  <!-- Download Section -->
+  <section id="download" class="py-20 bg-gradient-primary">
     <div class="container mx-auto px-4 text-center">
-      <h2 class="text-3xl font-bold mb-6">Liên hệ & cộng đồng</h2>
-      <div class="flex flex-col md:flex-row justify-center items-center gap-4">
-        <a href="https://t.me/vieosgroup" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full transition">Telegram Group</a>
-        <a href="https://facebook.com/vieos.rom" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-full transition">Fanpage Facebook</a>
+      <div class="fade-in-observer">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6 text-white">
+          Sẵn sàng trải nghiệm VieOS?
+        </h2>
+        <p class="text-xl text-red-100 mb-8 max-w-3xl mx-auto">
+          Tải xuống ngay bây giờ và khám phá sự khác biệt mà VieOS mang lại cho thiết bị Android của bạn
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <a href="#" class="bg-white text-red-600 px-8 py-4 rounded-full font-semibold hover:bg-red-50 transition-all duration-300 transform hover:scale-105 shadow-lg">
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Tải VieOS
+          </a>
+          <a href="#" class="border-2 border-white text-white px-8 py-4 rounded-full font-semibold hover:bg-white hover:text-red-600 transition-all duration-300 transform hover:scale-105">
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            Hướng dẫn cài đặt
+          </a>
+        </div>
+        
+        <!-- Device compatibility -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 max-w-4xl mx-auto">
+          <h3 class="text-2xl font-semibold text-white mb-6">Thiết bị được hỗ trợ</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-white/90">
+            <div class="text-center">
+              <div class="text-3xl mb-2">📱</div>
+              <div class="font-medium">Xiaomi</div>
+              <div class="text-sm text-white/70">Mi, Redmi, POCO</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl mb-2">📱</div>
+              <div class="font-medium">Samsung</div>
+              <div class="text-sm text-white/70">Galaxy Series</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl mb-2">📱</div>
+              <div class="font-medium">Realme</div>
+              <div class="text-sm text-white/70">All Models</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl mb-2">📱</div>
+              <div class="font-medium">OnePlus</div>
+              <div class="text-sm text-white/70">Nord & Pro</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact" class="py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="container mx-auto px-4">
+      <div class="text-center mb-16 fade-in-observer">
+        <h2 class="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+          Liên hệ & Cộng đồng
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300 text-lg max-w-3xl mx-auto">
+          Tham gia cộng đồng VieOS để nhận hỗ trợ, cập nhật và chia sẻ kinh nghiệm
+        </p>
+      </div>
+      
+      <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- Telegram -->
+        <div class="fade-in-observer bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <div class="flex items-center mb-6">
+            <div class="bg-blue-100 dark:bg-blue-900/30 w-16 h-16 rounded-full flex items-center justify-center mr-4">
+              <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.65.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Telegram Group</h3>
+              <p class="text-gray-600 dark:text-gray-300">Cộng đồng chính thức</p>
+            </div>
+          </div>
+          <p class="text-gray-600 dark:text-gray-300 mb-6">
+            Tham gia nhóm Telegram để nhận hỗ trợ nhanh chóng, cập nhật mới nhất và thảo luận với cộng đồng.
+          </p>
+          <a href="https://t.me/vieosgroup" 
+             class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 transform hover:scale-105">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.65.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+            </svg>
+            Tham gia ngay
+          </a>
+        </div>
+        
+        <!-- Facebook -->
+        <div class="fade-in-observer bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+          <div class="flex items-center mb-6">
+            <div class="bg-blue-100 dark:bg-blue-900/30 w-16 h-16 rounded-full flex items-center justify-center mr-4">
+              <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Facebook Fanpage</h3>
+              <p class="text-gray-600 dark:text-gray-300">Tin tức & cập nhật</p>
+            </div>
+          </div>
+          <p class="text-gray-600 dark:text-gray-300 mb-6">
+            Theo dõi fanpage Facebook để nhận tin tức mới nhất, thông báo cập nhật và các bài viết hướng dẫn.
+          </p>
+          <a href="https://facebook.com/vieos.rom" 
+             class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 transform hover:scale-105">
+            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Theo dõi ngay
+          </a>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="bg-gray-100 dark:bg-gray-800 py-6 text-center text-sm text-gray-500 dark:text-gray-400 fade-in">
-    © 2025 VieOS Team. Made with ♥ in Vietnam. | 
-    <a href="changelog.html" class="text-red-600 hover:underline">Changelog</a> | 
-    <a href="credit.html" class="text-red-600 hover:underline">Credit</a>
+  <footer class="bg-gray-900 text-gray-300 py-12">
+    <div class="container mx-auto px-4">
+      <div class="grid md:grid-cols-4 gap-8">
+        <!-- Logo & Description -->
+        <div class="col-span-2">
+          <div class="flex items-center space-x-3 mb-6">
+            <img src="logos/logo2.png" alt="VieOS Logo" class="h-10 w-15">
+            <!--<span class="text-2xl font-bold text-white">VieOS</span>-->
+          </div>
+          <p class="text-gray-400 mb-6 max-w-md">
+            ROM Android thuần Việt, được phát triển bởi cộng đồng và dành cho cộng đồng. 
+            Nhanh, mượt, sạch và hoàn toàn miễn phí.
+          </p>
+          <div class="flex space-x-4">
+            <a href="https://t.me/vieosgroup" class="text-gray-400 hover:text-white transition-colors duration-200">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.65.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+              </svg>
+            </a>
+            <a href="https://facebook.com/vieos.rom" class="text-gray-400 hover:text-white transition-colors duration-200">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-white font-semibold mb-4">Liên kết nhanh</h4>
+          <ul class="space-y-2">
+            <li><a href="#about" class="text-gray-400 hover:text-white transition-colors duration-200">Giới thiệu</a></li>
+            <li><a href="#features" class="text-gray-400 hover:text-white transition-colors duration-200">Tính năng</a></li>
+            <li><a href="#screenshots" class="text-gray-400 hover:text-white transition-colors duration-200">Hình ảnh</a></li>
+            <li><a href="#download" class="text-gray-400 hover:text-white transition-colors duration-200">Tải về</a></li>
+          </ul>
+        </div>
+        
+        <!-- Resources -->
+        <div>
+          <h4 class="text-white font-semibold mb-4">Tài nguyên</h4>
+          <ul class="space-y-2">
+            <li><a href="changelog.html" class="text-gray-400 hover:text-white transition-colors duration-200">Changelog</a></li>
+            <li><a href="credit.html" class="text-gray-400 hover:text-white transition-colors duration-200">Credit</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">Hướng dẫn</a></li>
+            <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">FAQ</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+        <p>&copy; 2025 VieOS Team. Made with ❤️ in Vietnam.</p>
+        <p class="mt-2 text-sm">Phát triển bởi cộng đồng, dành cho cộng đồng</p>
+      </div>
+    </div>
   </footer>
 
+  <!-- Back to top button -->
+  <button x-data="{ show: false }" 
+          x-show="show"
+          x-transition:enter="transition ease-out duration-300"
+          x-transition:enter-start="opacity-0 scale-90"
+          x-transition:enter-end="opacity-100 scale-100"
+          x-transition:leave="transition ease-in duration-200"
+          x-transition:leave-start="opacity-100 scale-100"
+          x-transition:leave-end="opacity-0 scale-90"
+          @scroll.window="show = window.pageYOffset > 500"
+          @click="window.scrollTo({ top: 0, behavior: 'smooth' })"
+          class="fixed bottom-8 right-8 bg-red-600 hover:bg-red-700 text-white p-3 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110 z-50">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+    </svg>
+  </button>
+
+  <!-- Intersection Observer for animations -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, observerOptions);
+
+      document.querySelectorAll('.fade-in-observer').forEach(el => {
+        observer.observe(el);
+      });
+    });
+  </script>
 </body>
 </html>
